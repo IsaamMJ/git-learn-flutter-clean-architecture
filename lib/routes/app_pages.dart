@@ -33,6 +33,7 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.apiData,
+
       page: () => const ApiDataPage(),
       binding: ApiDataBinding(),
     ),

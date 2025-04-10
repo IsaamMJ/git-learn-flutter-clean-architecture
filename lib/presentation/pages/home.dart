@@ -31,19 +31,20 @@ class HomeScreen extends StatelessWidget {
                 textCancel: "Cancel",
                 textConfirm: "Confirm",
                 onCancel: Get.back,
-                onConfirm: () {
-                  controller.deleteItem(car.id);
+                onConfirm: () async {
+                  await controller.deleteCar(car.id);
                   Get.back();
                 },
               );
             },
-            onEdit: (newTitle, newDesc) {
+            onEdit: (newTitle, newDesc) async {
               final updatedCar = car.copyWith(
                 title: newTitle,
                 description: newDesc,
               );
-              controller.updateItem(car.id, updatedCar);
+              await controller.updateCar(car.id, updatedCar);
             },
+
           );
         },
       );
