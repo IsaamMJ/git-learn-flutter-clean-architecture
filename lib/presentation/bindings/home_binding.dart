@@ -9,30 +9,27 @@ import 'package:untitled/domain/usecases/get_all_cars_usecase.dart';
 import 'package:untitled/domain/usecases/add_car_usecase.dart';
 import 'package:untitled/domain/usecases/update_car_usecase.dart';
 import 'package:untitled/domain/usecases/delete_car_usecase.dart';
+import 'package:untitled/domain/usecases/check_login_status_usecase.dart';
 import 'package:untitled/debug/hive_debug_service.dart';
 
 class HomeBinding extends Bindings {
   @override
   void dependencies() {
-
     Get.put(HiveDebugService());
-
 
     final localStorageDataSource = LocalStorageDatasource();
     final authRepository = AuthRepositoryImpl(localStorageDataSource);
-    final logoutUseCase = LogoutUseCase(authRepository);
 
+    final logoutUseCase = LogoutUseCase(authRepository);
+    final checkLoginStatusUseCase = CheckLoginStatusUseCase(authRepository);
 
     final carLocalDatasource = CarLocalDatasource();
     final carRepository = CarRepositoryImpl(carLocalDatasource);
-
-
 
     final getAllCarsUseCase = GetAllCarsUseCase(carRepository);
     final addCarUseCase = AddCarUseCase(carRepository);
     final updateCarUseCase = UpdateCarUseCase(carRepository);
     final deleteCarUseCase = DeleteCarUseCase(carRepository);
-
 
     Get.put<HomeController>(
       HomeController(
@@ -41,6 +38,7 @@ class HomeBinding extends Bindings {
         addCarUseCase: addCarUseCase,
         updateCarUseCase: updateCarUseCase,
         deleteCarUseCase: deleteCarUseCase,
+        checkLoginStatusUseCase: checkLoginStatusUseCase,
       ),
     );
   }

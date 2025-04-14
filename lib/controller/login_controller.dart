@@ -2,6 +2,9 @@ import 'package:get/get.dart';
 import '../../core/constant/regex.dart';
 import '../../domain/usecases/login_usecase.dart';
 import '../../domain/usecases/check_login_status_usecase.dart';
+import '../../core/services/pending_navigation_service.dart';
+import '../../core/services/deep_link_service.dart';
+import '../../routes/app_routes.dart';
 
 class LoginController extends GetxController {
   final LoginUseCase _loginUseCase;
@@ -13,26 +16,34 @@ class LoginController extends GetxController {
   })  : _loginUseCase = loginUseCase,
         _checkStatusUseCase = checkStatusUseCase;
 
-
   final email = ''.obs;
   final password = ''.obs;
-
-
   final isLoading = false.obs;
-
 
   Future<void> login() async {
     isLoading.value = true;
+
     try {
       await _loginUseCase(email.value, password.value);
+      final pendingPath = Get.find<PendingNavigationService>().getPendingPath();
+
+      if (pendingPath != null && pendingPath.isNotEmpty) {
+        Future.delayed(const Duration(milliseconds: 300), () {
+          Get.find<DeepLinkService>().navigateToPath(pendingPath);
+        });
+      } else {
+        Get.offAllNamed(AppRoutes.main, arguments: 'home');
+      }
+
+    } catch (e) {
+      print(' Login error: $e');
+      Get.snackbar("Login Failed", "Invalid credentials or internal error.");
     } finally {
       isLoading.value = false;
     }
   }
 
-
   Future<bool> isLoggedIn() async => await _checkStatusUseCase();
-
 
   String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
@@ -42,7 +53,6 @@ class LoginController extends GetxController {
     }
     return null;
   }
-
 
   String? validatePassword(String? value) {
     if (value == null || value.trim().isEmpty) {

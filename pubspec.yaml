@@ -28,12 +28,17 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  get_it: ^7.6.0
+  collection: ^1.17.1
+
   dio: ^5.4.0
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   path_provider: ^2.1.1
   flutter:
     sdk: flutter
+  uni_links2:
+    path: lib_plugins/uni_links2
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -41,6 +46,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   shared_preferences: ^2.5.2
   get: ^4.7.2
+  go_router: ^14.8.1
 
 
 dev_dependencies:

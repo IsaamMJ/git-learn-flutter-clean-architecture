@@ -1,0 +1,38 @@
+group 'name.avioli.unilinks'
+version '0.4.0'
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.5.3'
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 33 // ✅ Update for modern Flutter compatibility
+
+    namespace 'name.avioli.unilinks' // ✅ REQUIRED for AGP compatibility
+
+    defaultConfig {
+        minSdkVersion 19 // ✅ Slight bump (16 is too low for some plugins)
+        targetSdkVersion 33
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+}

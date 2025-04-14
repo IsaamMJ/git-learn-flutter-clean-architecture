@@ -3,16 +3,22 @@ import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'routes/app_pages.dart';
 import 'routes/app_routes.dart';
-import 'package:untitled/presentation/bindings/base_binding.dart';
-import 'package:untitled/data/models/car.dart'; // ✅ Make sure this path is correct
+import 'presentation/bindings/base_binding.dart';
+import 'data/models/car.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // ✅ Ensures binding before async calls
-
-  await Hive.initFlutter();                  // ✅ Initialize Hive
-  Hive.registerAdapter(CarAdapter());        // ✅ Register the adapter for Car model
-
+  WidgetsFlutterBinding.ensureInitialized();
+  await _initLocalStorage();
   runApp(const MyApp());
+}
+
+Future<void> _initLocalStorage() async {
+  try {
+    await Hive.initFlutter();
+    Hive.registerAdapter(CarAdapter());
+  } catch (e) {
+    print('Failed to initialize local storage: $e');
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -23,17 +29,14 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: "XYZ Company App",
-
-      // Theme Setup
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       themeMode: ThemeMode.system,
 
-      // Dependency injection
       initialBinding: BaseBinding(),
 
-      // Routing with GetX
       getPages: AppPages.pages,
+
       initialRoute: AppRoutes.login,
     );
   }

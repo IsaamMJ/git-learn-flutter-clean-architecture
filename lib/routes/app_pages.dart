@@ -1,41 +1,35 @@
-import 'package:get/get.dart';
-import '../presentation/pages/login.dart';
-import '../presentation/pages/home.dart';
-import '../presentation/bindings/home_binding.dart';
-import '../presentation/pages/api_data.dart';
-import '../presentation/bindings/api_data_binding.dart';
-import '../presentation/bindings/login_binding.dart';
-import '../routes/app_routes.dart';
-import '../presentation/pages/main_navigation.dart';
+  import 'package:get/get.dart';
+  import '../presentation/pages/login.dart';
+  import '../presentation/pages/main_navigation.dart';
+  import '../presentation/pages/car_detail.dart';
+  import '../presentation/bindings/login_binding.dart';
+  import '../presentation/bindings/home_binding.dart';
+  import '../presentation/bindings/car_detail_binding.dart';
+  import '../routes/app_routes.dart';
 
-class AppPages {
-  static final pages = [
-    // Login Page
-    GetPage(
-      name: AppRoutes.login,
-      page: () => const LoginScreen(),
-      binding: LoginBinding(),
-      transition: Transition.fade,
-    ),
+  class AppPages {
+    static final pages = [
 
-    // Home Page
-    GetPage(
-      name: AppRoutes.home,
-      page: () => HomeScreen(),
-      binding: HomeBinding(),
-    ),
+      GetPage(
+        name: AppRoutes.login,
+        page: () => const LoginScreen(),
+        binding: LoginBinding(),
+        transition: Transition.fade,
+      ),
 
-    // Main Navigation
-    GetPage(
-      name: AppRoutes.main,
-      page: () => const MainNavigationScreen(),
-      binding: HomeBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.apiData,
+      GetPage(
+        name: AppRoutes.main,
+        page: () {
+          final tab = Get.arguments ?? 'home';
+          return MainNavigationScreen(initialTab: tab);
+        },
+        binding: HomeBinding(),
+      ),
 
-      page: () => const ApiDataPage(),
-      binding: ApiDataBinding(),
-    ),
-  ];
-}
+      GetPage(
+        name: '/car/:id',
+        page: () => const CarDetailPage(),
+        binding: CarDetailBinding(),
+      ),
+    ];
+  }

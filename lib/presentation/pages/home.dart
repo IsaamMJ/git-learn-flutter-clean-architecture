@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controller/home_controller.dart';
 import '../widgets/car_card.dart';
+import '../../routes/app_routes.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -21,30 +22,37 @@ class HomeScreen extends StatelessWidget {
         itemCount: items.length,
         itemBuilder: (context, index) {
           final car = items[index];
-          return CarCard(
-            car: car,
-            index: index,
-            onDelete: () {
-              Get.defaultDialog(
-                title: "Confirm Deletion",
-                middleText: "Are you sure you want to delete this car?",
-                textCancel: "Cancel",
-                textConfirm: "Confirm",
-                onCancel: Get.back,
-                onConfirm: () async {
-                  await controller.deleteCar(car.id);
-                  Get.back();
-                },
-              );
-            },
-            onEdit: (newTitle, newDesc) async {
-              final updatedCar = car.copyWith(
-                title: newTitle,
-                description: newDesc,
-              );
-              await controller.updateCar(car.id, updatedCar);
-            },
 
+          return GestureDetector(
+            onTap: () {
+              final encodedId = Uri.encodeComponent(car.id);
+              final route = AppRoutes.carDetail.replaceFirst(':id', encodedId);
+              Get.toNamed(route);
+            },
+            child: CarCard(
+              car: car,
+              index: index,
+              onDelete: () {
+                Get.defaultDialog(
+                  title: "Confirm Deletion",
+                  middleText: "Are you sure you want to delete this car?",
+                  textCancel: "Cancel",
+                  textConfirm: "Confirm",
+                  onCancel: Get.back,
+                  onConfirm: () async {
+                    await controller.deleteCar(car.id);
+                    Get.back();
+                  },
+                );
+              },
+              onEdit: (newTitle, newDesc) async {
+                final updatedCar = car.copyWith(
+                  title: newTitle,
+                  description: newDesc,
+                );
+                await controller.updateCar(car.id, updatedCar);
+              },
+            ),
           );
         },
       );

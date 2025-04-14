@@ -5,21 +5,22 @@ import '../domain/usecases/get_all_cars_usecase.dart';
 import '../domain/usecases/add_car_usecase.dart';
 import '../domain/usecases/update_car_usecase.dart';
 import '../domain/usecases/delete_car_usecase.dart';
+import '../domain/usecases/check_login_status_usecase.dart';
 import 'package:untitled/debug/hive_debug_service.dart';
+import 'package:untitled/core/services/pending_navigation_service.dart';
 
 class HomeController extends GetxController {
-  // UseCases
+
   final LogoutUseCase _logoutUseCase;
   final GetAllCarsUseCase _getAllCarsUseCase;
   final AddCarUseCase _addCarUseCase;
   final UpdateCarUseCase _updateCarUseCase;
   final DeleteCarUseCase _deleteCarUseCase;
-
-  // Debug Service (Hive)
+  final CheckLoginStatusUseCase _checkLoginStatusUseCase;
   final HiveDebugService _hiveDebugService;
 
-  // Car list to be used in UI (observable)
   final RxList<Car> items = <Car>[].obs;
+  final RxBool isLoggedIn = false.obs;
 
   HomeController({
     required LogoutUseCase logoutUseCase,
@@ -27,33 +28,59 @@ class HomeController extends GetxController {
     required AddCarUseCase addCarUseCase,
     required UpdateCarUseCase updateCarUseCase,
     required DeleteCarUseCase deleteCarUseCase,
-    HiveDebugService? hiveDebugService, // optional injection (for testing/flexibility)
+    required CheckLoginStatusUseCase checkLoginStatusUseCase,
+    HiveDebugService? hiveDebugService,
   })  : _logoutUseCase = logoutUseCase,
         _getAllCarsUseCase = getAllCarsUseCase,
         _addCarUseCase = addCarUseCase,
         _updateCarUseCase = updateCarUseCase,
         _deleteCarUseCase = deleteCarUseCase,
+        _checkLoginStatusUseCase = checkLoginStatusUseCase,
         _hiveDebugService = hiveDebugService ?? Get.find<HiveDebugService>();
 
   @override
   void onInit() {
     super.onInit();
+    _checkAuthStatus();
     loadCars();
   }
 
-  /// Load cars from Hive
-  void loadCars() async {
-    final carList = await _getAllCarsUseCase();
-    items.assignAll(carList);
+  void _checkAuthStatus() async {
+    final result = await _checkLoginStatusUseCase();
+    isLoggedIn.value = result;
+
+    if (result) {
+      final path = Get.find<PendingNavigationService>().consume();
+      if (path != null && path.isNotEmpty && Get.currentRoute != path) {
+        Future.delayed(const Duration(milliseconds: 300), () {
+          Get.toNamed(path);
+        });
+      }
+    }
   }
 
-  /// Add new car
+  Future<bool> readLoginStatusFromStorage() async {
+    final result = await _checkLoginStatusUseCase();
+    return result;
+  }
+
+  Future<bool> checkIfLoggedIn() async {
+    final result = await _checkLoginStatusUseCase();
+    isLoggedIn.value = result;
+    return result;
+  }
+
+  Future<void> logout() async {
+    await _logoutUseCase();
+    isLoggedIn.value = false;
+    final stored = await readLoginStatusFromStorage();
+  }
+
   Future<void> addCar(Car car) async {
     await _addCarUseCase(car);
     items.add(car);
   }
 
-  /// Update car by ID
   Future<void> updateCar(String id, Car updatedCar) async {
     await _updateCarUseCase(id, updatedCar);
     final index = items.indexWhere((item) => item.id == id);
@@ -62,16 +89,16 @@ class HomeController extends GetxController {
     }
   }
 
-  /// Delete car by ID
   Future<void> deleteCar(String id) async {
     await _deleteCarUseCase(id);
     items.removeWhere((item) => item.id == id);
   }
 
-  /// Logout logic
-  Future<void> logout() async => await _logoutUseCase();
+  void loadCars() async {
+    final carList = await _getAllCarsUseCase();
+    items.assignAll(carList);
+  }
 
-  /// 🔍 Print all Hive data (for debug use)
   void debugPrintHiveData() {
     _hiveDebugService.printAllCars();
   }
