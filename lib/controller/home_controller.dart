@@ -7,10 +7,8 @@ import '../domain/usecases/update_car_usecase.dart';
 import '../domain/usecases/delete_car_usecase.dart';
 import '../domain/usecases/check_login_status_usecase.dart';
 import 'package:untitled/debug/hive_debug_service.dart';
-import 'package:untitled/core/services/pending_navigation_service.dart';
 
 class HomeController extends GetxController {
-
   final LogoutUseCase _logoutUseCase;
   final GetAllCarsUseCase _getAllCarsUseCase;
   final AddCarUseCase _addCarUseCase;
@@ -49,14 +47,7 @@ class HomeController extends GetxController {
     final result = await _checkLoginStatusUseCase();
     isLoggedIn.value = result;
 
-    if (result) {
-      final path = Get.find<PendingNavigationService>().consume();
-      if (path != null && path.isNotEmpty && Get.currentRoute != path) {
-        Future.delayed(const Duration(milliseconds: 300), () {
-          Get.toNamed(path);
-        });
-      }
-    }
+    // 🚫 No deep link navigation here — handled by SplashScreen
   }
 
   Future<bool> readLoginStatusFromStorage() async {

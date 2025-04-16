@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controller/home_controller.dart';
 import '../widgets/car_card.dart';
-import '../../routes/app_routes.dart';
+import 'car_detail.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -25,9 +25,7 @@ class HomeScreen extends StatelessWidget {
 
           return GestureDetector(
             onTap: () {
-              final encodedId = Uri.encodeComponent(car.id);
-              final route = AppRoutes.carDetail.replaceFirst(':id', encodedId);
-              Get.toNamed(route);
+              Get.to(() => CarDetailPage(carId: car.id));
             },
             child: CarCard(
               car: car,
@@ -54,6 +52,7 @@ class HomeScreen extends StatelessWidget {
               },
             ),
           );
+
         },
       );
     });

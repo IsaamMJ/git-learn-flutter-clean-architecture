@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controller/login_controller.dart';
-import '../../routes/app_routes.dart';
+import '../pages/main_navigation.dart';
+import '../../core/services/deep_link_service.dart';
+import '../../core/utils/deeplink_handler.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,7 +15,6 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final LoginController _controller = Get.find<LoginController>();
-
 
   final emailFieldController = TextEditingController();
   final passwordFieldController = TextEditingController();
@@ -31,7 +32,21 @@ class _LoginScreenState extends State<LoginScreen> {
       _controller.email.value = emailFieldController.text;
       _controller.password.value = passwordFieldController.text;
       await _controller.login();
-      Get.offAllNamed(AppRoutes.main);
+
+      final deepLinkService = Get.find<DeepLinkService>();
+      final deepLinkPath = deepLinkService.pendingPath.value;
+      deepLinkService.pendingPath.value = null;
+
+      if (deepLinkPath != null && deepLinkPath.isNotEmpty) {
+        final page = await resolveDeepLinkPage(deepLinkPath);
+
+        if (page != null) {
+          Get.offAll(() => page);
+          return;
+        }
+      }
+
+      Get.offAll(() => MainNavigationScreen(initialTab: 'home'));
     }
   }
 
@@ -61,8 +76,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 30),
-
-                  //  Email Field
                   TextFormField(
                     controller: emailFieldController,
                     keyboardType: TextInputType.emailAddress,
@@ -77,8 +90,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     validator: _controller.validateEmail,
                   ),
                   const SizedBox(height: 20),
-
-                  //  Password Field
                   TextFormField(
                     controller: passwordFieldController,
                     obscureText: true,
@@ -93,8 +104,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     validator: _controller.validatePassword,
                   ),
                   const SizedBox(height: 10),
-
-                  // ️ Remember Me + Forgot Password
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -131,8 +140,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   const SizedBox(height: 20),
-
-                  // Login Button / Loader
                   _controller.isLoading.value
                       ? const CircularProgressIndicator()
                       : SizedBox(

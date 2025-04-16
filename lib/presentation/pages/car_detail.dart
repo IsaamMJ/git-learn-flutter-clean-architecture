@@ -3,18 +3,32 @@ import 'package:get/get.dart';
 import 'package:untitled/controller/car_detail_controller.dart';
 import 'package:untitled/routes/app_routes.dart';
 
-class CarDetailPage extends GetView<CarDetailController> {
-  const CarDetailPage({super.key});
+class CarDetailPage extends StatelessWidget {
+  final String carId;
+
+  CarDetailPage({super.key, required this.carId}) {
+    Get.put(CarDetailController(carId), tag: carId);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<CarDetailController>(tag: carId);
+
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         leading: Navigator.of(context).canPop()
-            ? null
+            ? IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Get.back(),
+        )
             : IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Get.offAllNamed(AppRoutes.main, arguments: 'home'),
+          onPressed: () {
+            Future.microtask(() {
+              Get.offAllNamed(AppRoutes.main, arguments: 'home');
+            });
+          },
         ),
         title: const Text('Detail Page'),
         centerTitle: true,
@@ -23,14 +37,25 @@ class CarDetailPage extends GetView<CarDetailController> {
         final car = controller.car.value;
 
         if (car == null) {
-          return const Center(child: Text("Car not found or still loading..."));
+          return const Center(
+            child: Text(
+              "Car not found or still loading...",
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.black54,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          );
         }
 
         return SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Card(
             elevation: 6,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             clipBehavior: Clip.antiAlias,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -42,7 +67,11 @@ class CarDetailPage extends GetView<CarDetailController> {
                   errorBuilder: (_, __, ___) => const Padding(
                     padding: EdgeInsets.all(24),
                     child: Center(
-                      child: Icon(Icons.broken_image, size: 80, color: Colors.grey),
+                      child: Icon(
+                        Icons.broken_image,
+                        size: 80,
+                        color: Colors.grey,
+                      ),
                     ),
                   ),
                 ),
