@@ -6,6 +6,7 @@ import '../presentation/pages/main_navigation.dart';
 import '../presentation/bindings/login_binding.dart';
 import '../presentation/bindings/home_binding.dart';
 import '../routes/app_routes.dart';
+import '../presentation/pages/car_detail.dart';
 
 class AppPages {
   static final pages = [
@@ -23,6 +24,13 @@ class AppPages {
       name: AppRoutes.main,
       page: () => MainNavigationScreen(),
       binding: HomeBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.carDetail,
+      page: () {
+        final carId = Get.arguments as String;
+        return CarDetailPage(carId: carId);
+      },
     ),
   ];
 }

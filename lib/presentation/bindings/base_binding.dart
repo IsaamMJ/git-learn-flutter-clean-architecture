@@ -13,10 +13,16 @@ import 'package:untitled/domain/usecases/delete_car_usecase.dart';
 import 'package:untitled/domain/usecases/check_login_status_usecase.dart';
 import 'package:untitled/debug/hive_debug_service.dart';
 
+import '../../core/services/firebase_notification_service.dart';
+
 class BaseBinding extends Bindings {
   @override
   void dependencies() {
     Get.put(ThemeController(), permanent: true);
+
+    final firebaseNotificationService = FirebaseNotificationService();
+    firebaseNotificationService.init(); // <-- Add this line
+    Get.put(firebaseNotificationService, permanent: true);
 
     final localStorageDataSource = LocalStorageDatasource();
     final authRepository = AuthRepositoryImpl(localStorageDataSource);
