@@ -4,6 +4,7 @@ import '../../controller/login_controller.dart';
 import '../pages/main_navigation.dart';
 import '../../core/services/deep_link_service.dart';
 import '../../core/utils/deeplink_handler.dart';
+import '../../domain/entities/user_entity.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -31,7 +32,10 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_formKey.currentState!.validate()) {
       _controller.email.value = emailFieldController.text;
       _controller.password.value = passwordFieldController.text;
-      await _controller.login();
+
+      UserEntity? user = await _controller.login();
+
+      if (user == null) return;
 
       final deepLinkService = Get.find<DeepLinkService>();
       final deepLinkPath = deepLinkService.pendingPath.value;
@@ -39,7 +43,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (deepLinkPath != null && deepLinkPath.isNotEmpty) {
         final page = await resolveDeepLinkPage(deepLinkPath);
-
         if (page != null) {
           Get.offAll(() => page);
           return;
@@ -122,15 +125,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Get.snackbar(
-                            'Redirecting',
-                            'Redirecting to Forget Password Screen',
-                            duration: const Duration(seconds: 3),
-                            snackPosition: SnackPosition.BOTTOM,
-                          );
+                          Get.toNamed('/register');
                         },
                         child: const Text(
-                          "Forget Password?",
+                          "New User?",
                           style: TextStyle(
                             color: Colors.blue,
                             decoration: TextDecoration.underline,

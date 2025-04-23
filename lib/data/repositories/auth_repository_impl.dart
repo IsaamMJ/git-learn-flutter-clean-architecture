@@ -1,24 +1,42 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../datasources/local_storage_datasource.dart';
+import '../models/user_model.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  final LocalStorageDatasource _datasource;
-
-  AuthRepositoryImpl(this._datasource);
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   @override
-  Future<void> login(String email, String password) async {
+  Future<UserEntity?> login(String email, String password) async {
+    final result = await _firebaseAuth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return UserModel.fromFirebaseUser(result.user!);
+  }
 
-    await _datasource.setLoggedIn(true);
+  @override
+  Future<UserEntity?> register(String email, String password) async {
+    final result = await _firebaseAuth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return UserModel.fromFirebaseUser(result.user!);
   }
 
   @override
   Future<void> logout() async {
-    await _datasource.setLoggedIn(false);
+    await _firebaseAuth.signOut();
   }
 
   @override
   Future<bool> isLoggedIn() async {
-    return await _datasource.isLoggedIn();
+    return _firebaseAuth.currentUser != null;
+  }
+
+  @override
+  Future<UserEntity?> getCurrentUser() async {
+    final user = _firebaseAuth.currentUser;
+    return user != null ? UserModel.fromFirebaseUser(user) : null;
   }
 }

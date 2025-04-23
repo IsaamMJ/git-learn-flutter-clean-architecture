@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 import 'package:untitled/controller/home_controller.dart';
-import 'package:untitled/data/datasources/local_storage_datasource.dart';
 import 'package:untitled/data/datasources/car_local_datasource.dart';
 import 'package:untitled/data/repositories/auth_repository_impl.dart';
 import 'package:untitled/data/repositories/car_repository_impl.dart';
@@ -17,8 +16,8 @@ class HomeBinding extends Bindings {
   void dependencies() {
     Get.put(HiveDebugService());
 
-    final localStorageDataSource = LocalStorageDatasource();
-    final authRepository = AuthRepositoryImpl(localStorageDataSource);
+
+    final authRepository = AuthRepositoryImpl();
 
     final logoutUseCase = LogoutUseCase(authRepository);
     final checkLoginStatusUseCase = CheckLoginStatusUseCase(authRepository);
