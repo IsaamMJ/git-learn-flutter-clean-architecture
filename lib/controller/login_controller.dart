@@ -3,6 +3,7 @@ import '../../core/constant/regex.dart';
 import '../../domain/usecases/login_usecase.dart';
 import '../../domain/usecases/check_login_status_usecase.dart';
 import '../../routes/app_routes.dart';
+import '../../domain/entities/user_entity.dart';
 
 class LoginController extends GetxController {
   final LoginUseCase _loginUseCase;
@@ -18,16 +19,18 @@ class LoginController extends GetxController {
   final password = ''.obs;
   final isLoading = false.obs;
 
-  Future<void> login() async {
+  Future<UserEntity?> login() async {
     isLoading.value = true;
-
     try {
-      await _loginUseCase(email.value, password.value);
-
-      Get.offAllNamed(AppRoutes.main, arguments: 'home');
+      UserEntity? user = await _loginUseCase(email.value, password.value);
+      if (user != null) {
+        Get.offAllNamed(AppRoutes.main, arguments: 'home');
+      } else {
+        Get.snackbar("Login Failed", "Invalid email or password.");
+      }
     } catch (e) {
       print('Login error: $e');
-      Get.snackbar("Login Failed", "Invalid credentials or internal error.");
+      Get.snackbar("Login Failed", "An unexpected error occurred.");
     } finally {
       isLoading.value = false;
     }

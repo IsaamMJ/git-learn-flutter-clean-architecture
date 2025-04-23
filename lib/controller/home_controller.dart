@@ -47,7 +47,7 @@ class HomeController extends GetxController {
     final result = await _checkLoginStatusUseCase();
     isLoggedIn.value = result;
 
-    // 🚫 No deep link navigation here — handled by SplashScreen
+
   }
 
   Future<bool> readLoginStatusFromStorage() async {
